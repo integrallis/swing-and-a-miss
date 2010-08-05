@@ -286,14 +286,14 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 					if (displayMode != ERROR_MODE) {
 						try {
 							if (getDisplayString().indexOf("-") == 0)
-								displayError("Invalid input for function!");
+							   display("Invalid input for function!", ERROR_MODE, true, 0);
 
 							result = Math.sqrt(getNumberInDisplay());
-							displayResult(result);
+							display(Double.toString(result), RESULT_MODE, true, result);
 						}
 
 						catch (Exception ex) {
-							displayError("Invalid input for function!");
+							display("Invalid input for function!", ERROR_MODE, true, 0);
 							displayMode = ERROR_MODE;
 						}
 					}
@@ -303,14 +303,14 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 					if (displayMode != ERROR_MODE) {
 						try {
 							if (getNumberInDisplay() == 0)
-								displayError("Cannot divide by zero!");
+							    display("Cannot divide by zero!", ERROR_MODE, true, 0);
 
 							result = 1 / getNumberInDisplay();
-							displayResult(result);
+							display(Double.toString(result), RESULT_MODE, true, result);
 						}
 
 						catch (Exception ex) {
-							displayError("Cannot divide by zero!");
+							display("Cannot divide by zero!", ERROR_MODE, true, 0);
 							displayMode = ERROR_MODE;
 						}
 					}
@@ -320,11 +320,11 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 					if (displayMode != ERROR_MODE) {
 						try {
 							result = getNumberInDisplay() / 100;
-							displayResult(result);
+							display(Double.toString(result), RESULT_MODE, true, result);
 						}
 
 						catch (Exception ex) {
-							displayError("Invalid input for function!");
+							display("Invalid input for function!", ERROR_MODE, true, 0);
 							displayMode = ERROR_MODE;
 						}
 					}
@@ -411,7 +411,7 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 			double numberInDisplay = getNumberInDisplay();
 
 			if (numberInDisplay != 0)
-				displayResult(-numberInDisplay);
+			    display(Double.toString(-numberInDisplay), RESULT_MODE, true, -numberInDisplay);
 		}
 	}
 
@@ -439,16 +439,10 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 			double numberInDisplay = getNumberInDisplay();
 
 			if (!lastOperator.equals("0")) {
-				//try {
-					double result = processLastOperator();
-					displayResult(result);
-					lastNumber = result;
-				//}
-
-				//catch (DivideByZeroException e) {
-				//}
+				double result = processLastOperator();
+				display(Double.toString(result), RESULT_MODE, true, result);
+				lastNumber = result;
 			}
-
 			else {
 				lastNumber = numberInDisplay;
 			}
@@ -459,22 +453,21 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 	}
 
 	void processEquals() {
-		double result = 0;
-
 		if (displayMode != ERROR_MODE) {
 			try {
-				result = processLastOperator();
-				displayResult(result);
+				double result = processLastOperator();
+				display(Double.toString(result), RESULT_MODE, true, result);
 			}
 			catch (ArithmeticException ae) {
-				if (ae.getMessage().equals("/ by zero")) displayError("Cannot divide by zero!");
+				if (ae.getMessage().equals("/ by zero")) 
+					display("Cannot divide by zero!", ERROR_MODE, true, 0);
 			}
 
 			lastOperator = "0";
 		}
 	}
 
-	double processLastOperator() /*throws DivideByZeroException */{
+	double processLastOperator() {
 		double result = 0;
 		double numberInDisplay = getNumberInDisplay();
 
@@ -493,14 +486,6 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 			result = lastNumber + numberInDisplay;
 
 		return result;
-	}
-
-	void displayResult(double result) {
-		display(Double.toString(result), RESULT_MODE, true, result);
-	}
-
-	void displayError(String errorMessage) {
-		display(errorMessage, ERROR_MODE, true, 0);
 	}
 	
 	void display(String displayString, int displayMode, boolean clearOnNextDigit, double lastNumber) {
