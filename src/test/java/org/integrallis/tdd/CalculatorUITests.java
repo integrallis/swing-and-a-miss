@@ -22,7 +22,6 @@ public class CalculatorUITests extends UISpecTestCase {
 	
 	@Test
 	public void testPressingADigit() throws Exception {
-		  // 1. Retrieve the components
 		  Window window = getMainWindow();
 		  Button numberOne = window.getButton("1");
 		  Button numberTwo = window.getButton("2");
