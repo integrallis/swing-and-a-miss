@@ -1,4 +1,4 @@
-package org.integrallis.tdd;
+package org.integrallis.tdd.ui;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +27,7 @@ public class CalculatorOperationsTest extends UISpecTestCase {
 
 	@Before
 	public void setUp() {
-        setAdapter(new MainClassAdapter(Calculator.class, new String[0]));
+        setAdapter(new MainClassAdapter(Main.class, new String[0]));
         window = getMainWindow();
 	}
 
@@ -62,6 +62,7 @@ public class CalculatorOperationsTest extends UISpecTestCase {
 				                             { new String[]{"1", "+", "2", "+"}, "3.0" },
 				                             { new String[]{"1", "+", "2", "+", "3", " CE ", "+", "7", "="}, "10.0" },
 				                             { new String[]{"1", "2", "3", "+", "4"}, "4" },
+				                             { new String[]{"1", "/", "0", "="}, "Cannot divide by zero!" },
 				                             { new String[]{"1", "2", "3", "4", "5", "6", "C"}, "0" },
 				                             { new String[]{"1", "2", "3", "+", "4", "5", "6"}, "456" }}
 		);
