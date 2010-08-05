@@ -49,175 +49,14 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 	double lastNumber;
 	String lastOperator;
 
-	private JMenu jmenuFile, jmenuHelp;
-	private JMenuItem jmenuitemExit, jmenuitemAbout;
-
-	private JLabel jlbOutput;
-	private JButton jbnButtons[];
-	private JPanel jplMaster, jplBackSpace, jplControl;
-
-	/*
-	 * Font(String name, int style, int size) Creates a new Font from the
-	 * specified name, style and point size.
-	 */
-
-	Font f12 = new Font("Times New Roman", 0, 12);
-	Font f121 = new Font("Times New Roman", 1, 12);
 
 	// Constructor
 	public CalculatorFrame() {
-		/*
-		 * Set Up the JMenuBar. Have Provided All JMenu's with Mnemonics Have
-		 * Provided some JMenuItem components with Keyboard Accelerators
-		 */
-
-		jmenuFile = new JMenu("File");
-		jmenuFile.setFont(f121);
-		jmenuFile.setMnemonic(KeyEvent.VK_F);
-
-		jmenuitemExit = new JMenuItem("Exit");
-		jmenuitemExit.setFont(f12);
-		jmenuitemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				ActionEvent.CTRL_MASK));
-		jmenuFile.add(jmenuitemExit);
-
-		jmenuHelp = new JMenu("Help");
-		jmenuHelp.setFont(f121);
-		jmenuHelp.setMnemonic(KeyEvent.VK_H);
-
-		jmenuitemAbout = new JMenuItem("About Calculator");
-		jmenuitemAbout.setFont(f12);
-		jmenuHelp.add(jmenuitemAbout);
-
-		JMenuBar mb = new JMenuBar();
-		mb.add(jmenuFile);
-		mb.add(jmenuHelp);
-		setJMenuBar(mb);
-
-		// Set frame layout manager
-
-		setBackground(Color.gray);
-
-		jplMaster = new JPanel();
-
-		jlbOutput = new JLabel("0");
-		jlbOutput.setHorizontalTextPosition(JLabel.RIGHT);
-		jlbOutput.setBackground(Color.WHITE);
-		jlbOutput.setOpaque(true);
-
-		// Add components to frame
-		getContentPane().add(jlbOutput, BorderLayout.NORTH);
-
-		jbnButtons = new JButton[23];
-		// GridLayout(int rows, int cols, int hgap, int vgap)
-
-		JPanel jplButtons = new JPanel(); // container for Jbuttons
-
-		// Create numeric Jbuttons
-		for (int i = 0; i <= 9; i++) {
-			// set each Jbutton label to the value of index
-			jbnButtons[i] = new JButton(String.valueOf(i));
-		}
-
-		// Create operator Jbuttons
-		jbnButtons[10] = new JButton("+/-");
-		jbnButtons[11] = new JButton(".");
-		jbnButtons[12] = new JButton("=");
-		jbnButtons[13] = new JButton("/");
-		jbnButtons[14] = new JButton("*");
-		jbnButtons[15] = new JButton("-");
-		jbnButtons[16] = new JButton("+");
-		jbnButtons[17] = new JButton("sqrt");
-		jbnButtons[18] = new JButton("1/x");
-		jbnButtons[19] = new JButton("%");
-
-		jplBackSpace = new JPanel();
-		jplBackSpace.setLayout(new GridLayout(1, 1, 2, 2));
-
-		jbnButtons[20] = new JButton("Backspace");
-		jplBackSpace.add(jbnButtons[20]);
-
-		jplControl = new JPanel();
-		jplControl.setLayout(new GridLayout(1, 2, 2, 2));
-
-		jbnButtons[21] = new JButton(" CE ");
-		jbnButtons[22] = new JButton("C");
-
-		jplControl.add(jbnButtons[21]);
-		jplControl.add(jbnButtons[22]);
-
-		// Setting all Numbered JButton's to Blue. The rest to Red
-		for (int i = 0; i < jbnButtons.length; i++) {
-			jbnButtons[i].setFont(f12);
-
-			if (i < 10)
-				jbnButtons[i].setForeground(Color.blue);
-
-			else
-				jbnButtons[i].setForeground(Color.red);
-		}
-
-		// Set panel layout manager for a 4 by 5 grid
-		jplButtons.setLayout(new GridLayout(4, 5, 2, 2));
-
-		// Add buttons to keypad panel starting at top left
-		// First row
-		for (int i = 7; i <= 9; i++) {
-			jplButtons.add(jbnButtons[i]);
-		}
-
-		// add button / and sqrt
-		jplButtons.add(jbnButtons[13]);
-		jplButtons.add(jbnButtons[17]);
-
-		// Second row
-		for (int i = 4; i <= 6; i++) {
-			jplButtons.add(jbnButtons[i]);
-		}
-
-		// add button * and x^2
-		jplButtons.add(jbnButtons[14]);
-		jplButtons.add(jbnButtons[18]);
-
-		// Third row
-		for (int i = 1; i <= 3; i++) {
-			jplButtons.add(jbnButtons[i]);
-		}
-
-		// adds button - and %
-		jplButtons.add(jbnButtons[15]);
-		jplButtons.add(jbnButtons[19]);
-
-		// Fourth Row
-		// add 0, +/-, ., +, and =
-		jplButtons.add(jbnButtons[0]);
-		jplButtons.add(jbnButtons[10]);
-		jplButtons.add(jbnButtons[11]);
-		jplButtons.add(jbnButtons[16]);
-		jplButtons.add(jbnButtons[12]);
-
-		jplMaster.setLayout(new BorderLayout());
-		jplMaster.add(jplBackSpace, BorderLayout.WEST);
-		jplMaster.add(jplControl, BorderLayout.EAST);
-		jplMaster.add(jplButtons, BorderLayout.SOUTH);
-
-		// Add components to frame
-		getContentPane().add(jplMaster, BorderLayout.SOUTH);
-		requestFocus();
-
-		// activate ActionListener
-		for (int i = 0; i < jbnButtons.length; i++) {
-			jbnButtons[i].addActionListener(this);
-		}
-
-		jmenuitemAbout.addActionListener(this);
-		jmenuitemExit.addActionListener(this);
-
+		initComponents();
 		clearAll();
 
 		// add WindowListener for closing frame and ending program
 		addWindowListener(new WindowAdapter() {
-
 			public void windowClosed(WindowEvent e) {
 				System.exit(0);
 			}
@@ -493,6 +332,169 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 		this.lastNumber = lastNumber;
 		this.displayMode = displayMode;
 		this.clearOnNextDigit = clearOnNextDigit;
+	}
+	
+	private JMenu jmenuFile, jmenuHelp;
+	private JMenuItem jmenuitemExit, jmenuitemAbout;
+
+	private JLabel jlbOutput;
+	private JButton jbnButtons[];
+	private JPanel jplMaster, jplBackSpace, jplControl;
+
+	/*
+	 * Font(String name, int style, int size) Creates a new Font from the
+	 * specified name, style and point size.
+	 */
+
+	Font f12 = new Font("Times New Roman", 0, 12);
+	Font f121 = new Font("Times New Roman", 1, 12);
+	
+	private void initComponents() {
+		/*
+		 * Set Up the JMenuBar. Have Provided All JMenu's with Mnemonics Have
+		 * Provided some JMenuItem components with Keyboard Accelerators
+		 */
+		jmenuFile = new JMenu("File");
+		jmenuFile.setFont(f121);
+		jmenuFile.setMnemonic(KeyEvent.VK_F);
+
+		jmenuitemExit = new JMenuItem("Exit");
+		jmenuitemExit.setFont(f12);
+		jmenuitemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+				ActionEvent.CTRL_MASK));
+		jmenuFile.add(jmenuitemExit);
+
+		jmenuHelp = new JMenu("Help");
+		jmenuHelp.setFont(f121);
+		jmenuHelp.setMnemonic(KeyEvent.VK_H);
+
+		jmenuitemAbout = new JMenuItem("About Calculator");
+		jmenuitemAbout.setFont(f12);
+		jmenuHelp.add(jmenuitemAbout);
+
+		JMenuBar mb = new JMenuBar();
+		mb.add(jmenuFile);
+		mb.add(jmenuHelp);
+		setJMenuBar(mb);
+
+		// Set frame layout manager
+
+		setBackground(Color.gray);
+
+		jplMaster = new JPanel();
+
+		jlbOutput = new JLabel("0");
+		jlbOutput.setHorizontalTextPosition(JLabel.RIGHT);
+		jlbOutput.setBackground(Color.WHITE);
+		jlbOutput.setOpaque(true);
+
+		// Add components to frame
+		getContentPane().add(jlbOutput, BorderLayout.NORTH);
+
+		jbnButtons = new JButton[23];
+		// GridLayout(int rows, int cols, int hgap, int vgap)
+
+		JPanel jplButtons = new JPanel(); // container for Jbuttons
+
+		// Create numeric Jbuttons
+		for (int i = 0; i <= 9; i++) {
+			// set each Jbutton label to the value of index
+			jbnButtons[i] = new JButton(String.valueOf(i));
+		}
+
+		// Create operator Jbuttons
+		jbnButtons[10] = new JButton("+/-");
+		jbnButtons[11] = new JButton(".");
+		jbnButtons[12] = new JButton("=");
+		jbnButtons[13] = new JButton("/");
+		jbnButtons[14] = new JButton("*");
+		jbnButtons[15] = new JButton("-");
+		jbnButtons[16] = new JButton("+");
+		jbnButtons[17] = new JButton("sqrt");
+		jbnButtons[18] = new JButton("1/x");
+		jbnButtons[19] = new JButton("%");
+
+		jplBackSpace = new JPanel();
+		jplBackSpace.setLayout(new GridLayout(1, 1, 2, 2));
+
+		jbnButtons[20] = new JButton("Backspace");
+		jplBackSpace.add(jbnButtons[20]);
+
+		jplControl = new JPanel();
+		jplControl.setLayout(new GridLayout(1, 2, 2, 2));
+
+		jbnButtons[21] = new JButton(" CE ");
+		jbnButtons[22] = new JButton("C");
+
+		jplControl.add(jbnButtons[21]);
+		jplControl.add(jbnButtons[22]);
+
+		// Setting all Numbered JButton's to Blue. The rest to Red
+		for (int i = 0; i < jbnButtons.length; i++) {
+			jbnButtons[i].setFont(f12);
+
+			if (i < 10)
+				jbnButtons[i].setForeground(Color.blue);
+
+			else
+				jbnButtons[i].setForeground(Color.red);
+		}
+
+		// Set panel layout manager for a 4 by 5 grid
+		jplButtons.setLayout(new GridLayout(4, 5, 2, 2));
+
+		// Add buttons to keypad panel starting at top left
+		// First row
+		for (int i = 7; i <= 9; i++) {
+			jplButtons.add(jbnButtons[i]);
+		}
+
+		// add button / and sqrt
+		jplButtons.add(jbnButtons[13]);
+		jplButtons.add(jbnButtons[17]);
+
+		// Second row
+		for (int i = 4; i <= 6; i++) {
+			jplButtons.add(jbnButtons[i]);
+		}
+
+		// add button * and x^2
+		jplButtons.add(jbnButtons[14]);
+		jplButtons.add(jbnButtons[18]);
+
+		// Third row
+		for (int i = 1; i <= 3; i++) {
+			jplButtons.add(jbnButtons[i]);
+		}
+
+		// adds button - and %
+		jplButtons.add(jbnButtons[15]);
+		jplButtons.add(jbnButtons[19]);
+
+		// Fourth Row
+		// add 0, +/-, ., +, and =
+		jplButtons.add(jbnButtons[0]);
+		jplButtons.add(jbnButtons[10]);
+		jplButtons.add(jbnButtons[11]);
+		jplButtons.add(jbnButtons[16]);
+		jplButtons.add(jbnButtons[12]);
+
+		jplMaster.setLayout(new BorderLayout());
+		jplMaster.add(jplBackSpace, BorderLayout.WEST);
+		jplMaster.add(jplControl, BorderLayout.EAST);
+		jplMaster.add(jplButtons, BorderLayout.SOUTH);
+
+		// Add components to frame
+		getContentPane().add(jplMaster, BorderLayout.SOUTH);
+		requestFocus();
+
+		// activate ActionListener
+		for (int i = 0; i < jbnButtons.length; i++) {
+			jbnButtons[i].addActionListener(this);
+		}
+
+		jmenuitemAbout.addActionListener(this);
+		jmenuitemExit.addActionListener(this);
 	}
 	
 	/**
