@@ -18,7 +18,6 @@ package org.integrallis.tdd.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -37,9 +36,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import org.integrallis.tdd.logic.DivideByZeroException;
-
 public class CalculatorFrame extends JFrame implements ActionListener {
+
 	// Variables
 	final int MAX_INPUT_LENGTH = 20;
 	final int INPUT_MODE = 0;
@@ -441,14 +439,14 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 			double numberInDisplay = getNumberInDisplay();
 
 			if (!lastOperator.equals("0")) {
-				try {
+				//try {
 					double result = processLastOperator();
 					displayResult(result);
 					lastNumber = result;
-				}
+				//}
 
-				catch (DivideByZeroException e) {
-				}
+				//catch (DivideByZeroException e) {
+				//}
 			}
 
 			else {
@@ -468,23 +466,20 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 				result = processLastOperator();
 				displayResult(result);
 			}
-
-			catch (DivideByZeroException e) {
-				displayError("Cannot divide by zero!");
+			catch (ArithmeticException ae) {
+				if (ae.getMessage().equals("/ by zero")) displayError("Cannot divide by zero!");
 			}
 
 			lastOperator = "0";
 		}
 	}
 
-	double processLastOperator() throws DivideByZeroException {
+	double processLastOperator() /*throws DivideByZeroException */{
 		double result = 0;
 		double numberInDisplay = getNumberInDisplay();
 
 		if (lastOperator.equals("/")) {
-			if (numberInDisplay == 0)
-				throw (new DivideByZeroException());
-
+			if (numberInDisplay == 0) throw (new ArithmeticException("/ by zero"));
 			result = lastNumber / numberInDisplay;
 		}
 
@@ -513,6 +508,11 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 		displayMode = ERROR_MODE;
 		clearOnNextDigit = true;
 	}
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 } // End of Swing Calculator Class.
 

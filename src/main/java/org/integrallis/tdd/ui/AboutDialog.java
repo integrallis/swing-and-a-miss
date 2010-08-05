@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 class AboutDialog extends JDialog implements ActionListener {
+
 	JButton jbnOk;
 
 	AboutDialog(JFrame parent, String title, boolean modal) {
@@ -64,5 +65,10 @@ class AboutDialog extends JDialog implements ActionListener {
 			this.dispose();
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 }
