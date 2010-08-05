@@ -496,17 +496,18 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 	}
 
 	void displayResult(double result) {
-		setDisplayString(Double.toString(result));
-		lastNumber = result;
-		displayMode = RESULT_MODE;
-		clearOnNextDigit = true;
+		display(Double.toString(result), RESULT_MODE, true, result);
 	}
 
 	void displayError(String errorMessage) {
-		setDisplayString(errorMessage);
-		lastNumber = 0;
-		displayMode = ERROR_MODE;
-		clearOnNextDigit = true;
+		display(errorMessage, ERROR_MODE, true, 0);
+	}
+	
+	void display(String displayString, int displayMode, boolean clearOnNextDigit, double lastNumber) {
+		setDisplayString(displayString);
+		this.lastNumber = lastNumber;
+		this.displayMode = displayMode;
+		this.clearOnNextDigit = clearOnNextDigit;
 	}
 	
 	/**
