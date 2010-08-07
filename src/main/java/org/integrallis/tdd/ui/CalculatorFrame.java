@@ -16,6 +16,28 @@ package org.integrallis.tdd.ui;
  6. All JButton components start with jbn*
  */
 
+import static org.integrallis.tdd.logic.CalculatorCommand.BACKSPACE;
+import static org.integrallis.tdd.logic.CalculatorCommand.C;
+import static org.integrallis.tdd.logic.CalculatorCommand.CE;
+import static org.integrallis.tdd.logic.CalculatorCommand.DECIMAL_POINT;
+import static org.integrallis.tdd.logic.CalculatorCommand.DIVIDE;
+import static org.integrallis.tdd.logic.CalculatorCommand.EQUALS;
+import static org.integrallis.tdd.logic.CalculatorCommand.FOUR;
+import static org.integrallis.tdd.logic.CalculatorCommand.INVERSE;
+import static org.integrallis.tdd.logic.CalculatorCommand.MINUS;
+import static org.integrallis.tdd.logic.CalculatorCommand.MULTIPLICATION;
+import static org.integrallis.tdd.logic.CalculatorCommand.NINE;
+import static org.integrallis.tdd.logic.CalculatorCommand.NOOP;
+import static org.integrallis.tdd.logic.CalculatorCommand.ONE;
+import static org.integrallis.tdd.logic.CalculatorCommand.PERCENT;
+import static org.integrallis.tdd.logic.CalculatorCommand.PLUS;
+import static org.integrallis.tdd.logic.CalculatorCommand.SEVEN;
+import static org.integrallis.tdd.logic.CalculatorCommand.SIGN_CHANGE;
+import static org.integrallis.tdd.logic.CalculatorCommand.SIX;
+import static org.integrallis.tdd.logic.CalculatorCommand.SQRT;
+import static org.integrallis.tdd.logic.CalculatorCommand.THREE;
+import static org.integrallis.tdd.logic.CalculatorCommand.ZERO;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -25,6 +47,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -35,6 +60,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+
+import org.integrallis.tdd.logic.CalculatorCommand;
 
 public class CalculatorFrame extends JFrame implements ActionListener {
 
@@ -76,118 +103,122 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 			System.exit(0);
 		}
 
-		// Search for the button pressed until end of array or key found
-		for (int i = 0; i < jbnButtons.length; i++) {
-			if (e.getSource() == jbnButtons[i]) {
-				switch (i) {
-				case 0:
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-				case 5:
-				case 6:
-				case 7:
-				case 8:
-				case 9:
-					addDigitToDisplay(i);
-					break;
-
-				case 10: // +/-
-					processSignChange();
-					break;
-
-				case 11: // decimal point
-					addDecimalPoint();
-					break;
-
-				case 12: // =
-					processEquals();
-					break;
-
-				case 13: // divide
-					processOperator("/");
-					break;
-
-				case 14: // *
-					processOperator("*");
-					break;
-
-				case 15: // -
-					processOperator("-");
-					break;
-
-				case 16: // +
-					processOperator("+");
-					break;
-
-				case 17: // sqrt
-					if (displayMode != ERROR_MODE) {
-						try {
-							if (getDisplayString().indexOf("-") == 0)
-							   display("Invalid input for function!", ERROR_MODE, true, 0);
-
-							result = Math.sqrt(getNumberInDisplay());
-							display(Double.toString(result), RESULT_MODE, true, result);
-						}
-
-						catch (Exception ex) {
-							display("Invalid input for function!", ERROR_MODE, true, 0);
-							displayMode = ERROR_MODE;
-						}
-					}
-					break;
-
-				case 18: // 1/x
-					if (displayMode != ERROR_MODE) {
-						try {
-							if (getNumberInDisplay() == 0)
-							    display("Cannot divide by zero!", ERROR_MODE, true, 0);
-
-							result = 1 / getNumberInDisplay();
-							display(Double.toString(result), RESULT_MODE, true, result);
-						}
-
-						catch (Exception ex) {
-							display("Cannot divide by zero!", ERROR_MODE, true, 0);
-							displayMode = ERROR_MODE;
-						}
-					}
-					break;
-
-				case 19: // %
-					if (displayMode != ERROR_MODE) {
-						try {
-							result = getNumberInDisplay() / 100;
-							display(Double.toString(result), RESULT_MODE, true, result);
-						}
-
-						catch (Exception ex) {
-							display("Invalid input for function!", ERROR_MODE, true, 0);
-							displayMode = ERROR_MODE;
-						}
-					}
-					break;
-
-				case 20: // backspace
-					if (displayMode != ERROR_MODE) {
-						setDisplayString(getDisplayString().substring(0,
-								getDisplayString().length() - 1));
-
-						if (getDisplayString().length() < 1)
-							setDisplayString("0");
-					}
-					break;
-
-				case 21: // CE
-					clearExisting();
-					break;
-
-				case 22: // C
-					clearAll();
-					break;
+		CalculatorCommand command = NOOP;
+		if (e.getSource() instanceof JButton) {
+			for (Map.Entry<CalculatorCommand,JButton> commandAndButton : jbnButtons.entrySet()) {
+				if (commandAndButton.getValue() == e.getSource()) {
+					command = commandAndButton.getKey();
 				}
 			}
+		}
+				
+		switch (command) {
+		case ZERO:
+		case ONE:
+		case TWO:
+		case THREE:
+		case FOUR:
+		case FIVE:
+		case SIX:
+		case SEVEN:
+		case EIGHT:
+		case NINE:
+			addDigitToDisplay(command.ordinal());
+			break;
+
+		case SIGN_CHANGE: // +/-
+			processSignChange();
+			break;
+
+		case DECIMAL_POINT: // decimal point
+			addDecimalPoint();
+			break;
+
+		case EQUALS: // =
+			processEquals();
+			break;
+
+		case DIVIDE: // divide
+			processOperator("/");
+			break;
+
+		case MULTIPLICATION: // *
+			processOperator("*");
+			break;
+
+		case MINUS: // -
+			processOperator("-");
+			break;
+
+		case PLUS: // +
+			processOperator("+");
+			break;
+
+		case SQRT: // sqrt
+			if (displayMode != ERROR_MODE) {
+				try {
+					if (getDisplayString().indexOf("-") == 0)
+					   display("Invalid input for function!", ERROR_MODE, true, 0);
+
+					result = Math.sqrt(getNumberInDisplay());
+					display(Double.toString(result), RESULT_MODE, true, result);
+				}
+
+				catch (Exception ex) {
+					display("Invalid input for function!", ERROR_MODE, true, 0);
+					displayMode = ERROR_MODE;
+				}
+			}
+			break;
+
+		case INVERSE: // 1/x
+			if (displayMode != ERROR_MODE) {
+				try {
+					if (getNumberInDisplay() == 0)
+					    display("Cannot divide by zero!", ERROR_MODE, true, 0);
+
+					result = 1 / getNumberInDisplay();
+					display(Double.toString(result), RESULT_MODE, true, result);
+				}
+
+				catch (Exception ex) {
+					display("Cannot divide by zero!", ERROR_MODE, true, 0);
+					displayMode = ERROR_MODE;
+				}
+			}
+			break;
+
+		case PERCENT: // %
+			if (displayMode != ERROR_MODE) {
+				try {
+					result = getNumberInDisplay() / 100;
+					display(Double.toString(result), RESULT_MODE, true, result);
+				}
+
+				catch (Exception ex) {
+					display("Invalid input for function!", ERROR_MODE, true, 0);
+					displayMode = ERROR_MODE;
+				}
+			}
+			break;
+
+		case BACKSPACE: // backspace
+			if (displayMode != ERROR_MODE) {
+				setDisplayString(getDisplayString().substring(0,
+						getDisplayString().length() - 1));
+
+				if (getDisplayString().length() < 1)
+					setDisplayString("0");
+			}
+			break;
+
+		case CE: // CE
+			clearExisting();
+			break;
+
+		case C: // C
+			clearAll();
+			break;
 		}
 	}
 
@@ -338,7 +369,7 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 	private JMenuItem jmenuitemExit, jmenuitemAbout;
 
 	private JLabel jlbOutput;
-	private JButton jbnButtons[];
+	private Map<CalculatorCommand,JButton> jbnButtons;
 	private JPanel jplMaster, jplBackSpace, jplControl;
 
 	/*
@@ -391,53 +422,38 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 		// Add components to frame
 		getContentPane().add(jlbOutput, BorderLayout.NORTH);
 
-		jbnButtons = new JButton[23];
-		// GridLayout(int rows, int cols, int hgap, int vgap)
+		jbnButtons = new HashMap<CalculatorCommand,JButton>();
 
 		JPanel jplButtons = new JPanel(); // container for Jbuttons
-
-		// Create numeric Jbuttons
-		for (int i = 0; i <= 9; i++) {
-			// set each Jbutton label to the value of index
-			jbnButtons[i] = new JButton(String.valueOf(i));
+		
+		// create all buttons based on available commands
+		for (CalculatorCommand command : CalculatorCommand.asList()) {
+			JButton button = new JButton(new CalculatorAction(command));
+			jbnButtons.put(command, button);
 		}
-
-		// Create operator Jbuttons
-		jbnButtons[10] = new JButton("+/-");
-		jbnButtons[11] = new JButton(".");
-		jbnButtons[12] = new JButton("=");
-		jbnButtons[13] = new JButton("/");
-		jbnButtons[14] = new JButton("*");
-		jbnButtons[15] = new JButton("-");
-		jbnButtons[16] = new JButton("+");
-		jbnButtons[17] = new JButton("sqrt");
-		jbnButtons[18] = new JButton("1/x");
-		jbnButtons[19] = new JButton("%");
 
 		jplBackSpace = new JPanel();
 		jplBackSpace.setLayout(new GridLayout(1, 1, 2, 2));
 
-		jbnButtons[20] = new JButton("Backspace");
-		jplBackSpace.add(jbnButtons[20]);
+		jplBackSpace.add(jbnButtons.get(BACKSPACE));
 
 		jplControl = new JPanel();
 		jplControl.setLayout(new GridLayout(1, 2, 2, 2));
 
-		jbnButtons[21] = new JButton(" CE ");
-		jbnButtons[22] = new JButton("C");
-
-		jplControl.add(jbnButtons[21]);
-		jplControl.add(jbnButtons[22]);
+		jplControl.add(jbnButtons.get(CE));
+		jplControl.add(jbnButtons.get(C));
 
 		// Setting all Numbered JButton's to Blue. The rest to Red
-		for (int i = 0; i < jbnButtons.length; i++) {
-			jbnButtons[i].setFont(f12);
+		for (CalculatorCommand command : CalculatorCommand.asList()) {
+			JButton button = jbnButtons.get(command);
+			button.setFont(f12);
+			if (command.ordinal() <= NINE.ordinal()) {
+				button.setForeground(Color.blue);
+			}
+			else {
+				button.setForeground(Color.red);
+			}
 
-			if (i < 10)
-				jbnButtons[i].setForeground(Color.blue);
-
-			else
-				jbnButtons[i].setForeground(Color.red);
 		}
 
 		// Set panel layout manager for a 4 by 5 grid
@@ -445,39 +461,39 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 
 		// Add buttons to keypad panel starting at top left
 		// First row
-		for (int i = 7; i <= 9; i++) {
-			jplButtons.add(jbnButtons[i]);
+		for (CalculatorCommand command : EnumSet.range(SEVEN, NINE)) {
+			jplButtons.add(jbnButtons.get(command));
 		}
 
 		// add button / and sqrt
-		jplButtons.add(jbnButtons[13]);
-		jplButtons.add(jbnButtons[17]);
+		jplButtons.add(jbnButtons.get(DIVIDE));
+		jplButtons.add(jbnButtons.get(SQRT));
 
 		// Second row
-		for (int i = 4; i <= 6; i++) {
-			jplButtons.add(jbnButtons[i]);
+		for (CalculatorCommand command : EnumSet.range(FOUR, SIX)) {
+			jplButtons.add(jbnButtons.get(command));
 		}
 
 		// add button * and x^2
-		jplButtons.add(jbnButtons[14]);
-		jplButtons.add(jbnButtons[18]);
+		jplButtons.add(jbnButtons.get(MULTIPLICATION));
+		jplButtons.add(jbnButtons.get(INVERSE));
 
 		// Third row
-		for (int i = 1; i <= 3; i++) {
-			jplButtons.add(jbnButtons[i]);
+		for (CalculatorCommand command : EnumSet.range(ONE, THREE)) {
+			jplButtons.add(jbnButtons.get(command));
 		}
 
 		// adds button - and %
-		jplButtons.add(jbnButtons[15]);
-		jplButtons.add(jbnButtons[19]);
+		jplButtons.add(jbnButtons.get(MINUS));
+		jplButtons.add(jbnButtons.get(PERCENT));
 
 		// Fourth Row
 		// add 0, +/-, ., +, and =
-		jplButtons.add(jbnButtons[0]);
-		jplButtons.add(jbnButtons[10]);
-		jplButtons.add(jbnButtons[11]);
-		jplButtons.add(jbnButtons[16]);
-		jplButtons.add(jbnButtons[12]);
+		jplButtons.add(jbnButtons.get(ZERO));
+		jplButtons.add(jbnButtons.get(SIGN_CHANGE));
+		jplButtons.add(jbnButtons.get(DECIMAL_POINT));
+		jplButtons.add(jbnButtons.get(PLUS));
+		jplButtons.add(jbnButtons.get(EQUALS));
 
 		jplMaster.setLayout(new BorderLayout());
 		jplMaster.add(jplBackSpace, BorderLayout.WEST);
@@ -489,8 +505,8 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 		requestFocus();
 
 		// activate ActionListener
-		for (int i = 0; i < jbnButtons.length; i++) {
-			jbnButtons[i].addActionListener(this);
+		for (JButton button : jbnButtons.values()) {
+			button.addActionListener(this);
 		}
 
 		jmenuitemAbout.addActionListener(this);
