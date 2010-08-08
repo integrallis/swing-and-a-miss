@@ -1,6 +1,7 @@
 package org.integrallis.tdd.logic;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 public enum CalculatorCommand {
@@ -47,4 +48,9 @@ public enum CalculatorCommand {
 	public static List<CalculatorCommand> asList() {
 		return Arrays.asList(values());
 	}
+	
+	public static EnumSet<CalculatorCommand> range(CalculatorCommand begin, CalculatorCommand end) {
+		return EnumSet.range(begin, end);
+	}
+
 }
