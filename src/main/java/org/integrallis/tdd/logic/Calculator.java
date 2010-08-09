@@ -1,23 +1,31 @@
 package org.integrallis.tdd.logic;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Calculator {
+
+	public enum Mode { INPUT, RESULT, ERROR }
+	
+	private String display = "0";
+	private String lastOperator;
+	private double lastNumber;
+	
 	private static final int MAX_INPUT_LENGTH = 20;
 	private boolean clearOnNextDigit;
-	private int displayMode;
+	private Mode displayMode;
 	
 	public boolean isClearOnNextDigit() {
 		return clearOnNextDigit;
 	}
 
-	public void setClearOnNextDigit(boolean clearOnNextDigit) {
-		this.clearOnNextDigit = clearOnNextDigit;
-	}
-
-	public int getDisplayMode() {
+	public Mode getDisplayMode() {
 		return displayMode;
 	}
 
-	public void setDisplayMode(int displayMode) {
+	public void setDisplayMode(final Mode displayMode) {
 		this.displayMode = displayMode;
 	}
 
@@ -25,88 +33,75 @@ public class Calculator {
 		return lastOperator;
 	}
 
-	public void setLastOperator(String lastOperator) {
-		this.lastOperator = lastOperator;
-	}
-
 	public double getLastNumber() {
 		return lastNumber;
 	}
-
-	public void setLastNumber(double lastNumber) {
-		this.lastNumber = lastNumber;
-	}
-
-	public static final int INPUT_MODE = 0;
-	public static final int RESULT_MODE = 1;
-	public static final int ERROR_MODE = 2;
-	
-	private String displayString = "0";
-	private String lastOperator;
-	private double lastNumber;
 	
 	public void addDigitToDisplay(int digit) {
-		if (clearOnNextDigit)
-			setDisplayString("");
+		if (clearOnNextDigit) {
+			setDisplay("");
+		}
 
-		String inputString = getDisplayString();
+		String inputString = getDisplay();
 
 		if (inputString.indexOf("0") == 0) {
 			inputString = inputString.substring(1);
 		}
 
-		if ((!inputString.equals("0") || digit > 0)
-				&& inputString.length() < MAX_INPUT_LENGTH) {
-			setDisplayString(inputString + digit);
+		if ((!inputString.equals("0") || digit > 0) && inputString.length() < MAX_INPUT_LENGTH) {
+			setDisplay(inputString + digit);
 		}
 
-		displayMode = INPUT_MODE;
+		displayMode = Mode.INPUT;
 		clearOnNextDigit = false;
 	}
 	
 	public void addDecimalPoint() {
-		displayMode = INPUT_MODE;
+		displayMode = Mode.INPUT;
 
-		if (clearOnNextDigit)
-			setDisplayString("");
+		if (clearOnNextDigit) {
+			setDisplay("");
+		}
 
-		String inputString = getDisplayString();
+		String inputString = getDisplay();
 
 		// If the input string already contains a decimal point, don't
 		// do anything to it.
-		if (inputString.indexOf(".") < 0)
-			setDisplayString(new String(inputString + "."));
+		if (inputString.indexOf(".") < 0) {
+			setDisplay(new String(inputString + "."));
+		}
 	}
 
 	public void processSignChange() {
-		if (displayMode == INPUT_MODE) {
-			String input = getDisplayString();
+		if (displayMode == Mode.INPUT) {
+			String input = getDisplay();
 
 			if (input.length() > 0 && !input.equals("0")) {
-				if (input.indexOf("-") == 0)
-					setDisplayString(input.substring(1));
-
-				else
-					setDisplayString("-" + input);
+				if (input.indexOf("-") == 0) {
+					setDisplay(input.substring(1));
+				}
+				else {
+					setDisplay("-" + input);
+				}
 			}
-
 		}
 
-		else if (displayMode == RESULT_MODE) {
+		else if (displayMode == Mode.RESULT) {
 			double numberInDisplay = getNumberInDisplay();
 
-			if (numberInDisplay != 0)
-			    display(Double.toString(-numberInDisplay), RESULT_MODE, true, -numberInDisplay);
+			if (numberInDisplay != 0) {
+			    display(Double.toString(-numberInDisplay), Mode.RESULT, true, -numberInDisplay);
+			}
 		}
 	}
 	
 	public void processOperator(String op) {
-		if (displayMode != ERROR_MODE) {
+		if (displayMode != Mode.ERROR) {
 			double numberInDisplay = getNumberInDisplay();
 
 			if (!lastOperator.equals("0")) {
 				double result = processLastOperator();
-				display(Double.toString(result), RESULT_MODE, true, result);
+				display(Double.toString(result), Mode.RESULT, true, result);
 				lastNumber = result;
 			}
 			else {
@@ -119,14 +114,14 @@ public class Calculator {
 	}
 
 	public void processEquals() {
-		if (displayMode != ERROR_MODE) {
+		if (displayMode != Mode.ERROR) {
 			try {
 				double result = processLastOperator();
-				display(Double.toString(result), RESULT_MODE, true, result);
+				display(Double.toString(result), Mode.RESULT, true, result);
 			}
 			catch (ArithmeticException ae) {
 				if (ae.getMessage().equals("/ by zero")) 
-					display("Cannot divide by zero!", ERROR_MODE, true, 0);
+					display("Cannot divide by zero!", Mode.ERROR, true, 0);
 			}
 
 			lastOperator = "0";
@@ -154,148 +149,52 @@ public class Calculator {
 		return result;
 	}
 	
-	public void display(String displayString, int displayMode, boolean clearOnNextDigit, double lastNumber) {
-		setDisplayString(displayString);
+	public void display(String displayString, Mode displayMode, boolean clearOnNextDigit, double lastNumber) {
+		setDisplay(displayString);
 		this.lastNumber = lastNumber;
 		this.displayMode = displayMode;
 		this.clearOnNextDigit = clearOnNextDigit;
 	}
 
 	public void clearAll() {
-		setDisplayString("0");
+		setDisplay("0");
 		lastOperator = "0";
 		lastNumber = 0;
-		displayMode = INPUT_MODE;
+		displayMode = Mode.INPUT;
 		clearOnNextDigit = true;
 	}
 
 	public void clearExisting() {
-		setDisplayString("0");
+		setDisplay("0");
 		clearOnNextDigit = true;
-		displayMode = INPUT_MODE;
+		displayMode = Mode.INPUT;
 	}
 
 
-	public String getDisplayString() {
-		return displayString;
+	public String getDisplay() {
+		return display;
 	}
 
-	public void setDisplayString(String string) {
-		displayString = string;
-		
+	public void setDisplay(String string) {
+		String oldValue = display;
+		display = string;
+		notifyListeners("display", oldValue, display);
 	}
 	
 	public double getNumberInDisplay() {
-		return Double.parseDouble(displayString);
+		return Double.parseDouble(display);
+	}
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		propertyChangeListerners.add(listener);
 	}
 	
-	public void processCommand(CalculatorCommand command) {
-		switch (command) {
-		case ZERO:
-		case ONE:
-		case TWO:
-		case THREE:
-		case FOUR:
-		case FIVE:
-		case SIX:
-		case SEVEN:
-		case EIGHT:
-		case NINE:
-			addDigitToDisplay(command.ordinal());
-			break;
-
-		case SIGN_CHANGE: // +/-
-			processSignChange();
-			break;
-
-		case DECIMAL_POINT: // decimal point
-			addDecimalPoint();
-			break;
-
-		case EQUALS: // =
-			processEquals();
-			break;
-
-		case DIVIDE: // divide
-			processOperator("/");
-			break;
-
-		case MULTIPLICATION: // *
-			processOperator("*");
-			break;
-
-		case MINUS: // -
-			processOperator("-");
-			break;
-
-		case PLUS: // +
-			processOperator("+");
-			break;
-
-		case SQRT: // sqrt
-			if (displayMode != ERROR_MODE) {
-				try {
-					if (getDisplayString().indexOf("-") == 0)
-					   display("Invalid input for function!", ERROR_MODE, true, 0);
-					double result = Math.sqrt(getNumberInDisplay());
-					display(Double.toString(result), RESULT_MODE, true, result);
-				}
-
-				catch (Exception ex) {
-					display("Invalid input for function!", ERROR_MODE, true, 0);
-					displayMode = ERROR_MODE;
-				}
-			}
-			break;
-
-		case INVERSE: // 1/x
-			if (displayMode != ERROR_MODE) {
-				try {
-					if (getNumberInDisplay() == 0)
-					    display("Cannot divide by zero!", ERROR_MODE, true, 0);
-
-					double result = 1 / getNumberInDisplay();
-					display(Double.toString(result), RESULT_MODE, true, result);
-				}
-
-				catch (Exception ex) {
-					display("Cannot divide by zero!", ERROR_MODE, true, 0);
-					displayMode = ERROR_MODE;
-				}
-			}
-			break;
-
-		case PERCENT: // %
-			if (displayMode != ERROR_MODE) {
-				try {
-					double result = getNumberInDisplay() / 100;
-					display(Double.toString(result), RESULT_MODE, true, result);
-				}
-
-				catch (Exception ex) {
-					display("Invalid input for function!", ERROR_MODE, true, 0);
-					displayMode = ERROR_MODE;
-				}
-			}
-			break;
-
-		case BACKSPACE: // backspace
-			if (displayMode != ERROR_MODE) {
-				setDisplayString(getDisplayString().substring(0,
-						getDisplayString().length() - 1));
-
-				if (getDisplayString().length() < 1)
-					setDisplayString("0");
-			}
-			break;
-
-		case CE: // CE
-			clearExisting();
-			break;
-
-		case C: // C
-			clearAll();
-			break;
-		}		
-	}   
+	private void notifyListeners(String property, Object oldValue, Object newValue) {
+		PropertyChangeEvent event = new PropertyChangeEvent(this, property, oldValue, newValue);
+	    for (PropertyChangeListener listener : propertyChangeListerners) {
+			listener.propertyChange(event);
+		}	
+	}
+	
+	private List<PropertyChangeListener> propertyChangeListerners = new ArrayList<PropertyChangeListener>();
 }

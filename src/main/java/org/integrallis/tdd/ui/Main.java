@@ -2,9 +2,11 @@ package org.integrallis.tdd.ui;
 
 import org.integrallis.tdd.logic.Calculator;
 
-public class Main {
-	public static void main(String args[]) {
-		CalculatorFrame frame = new CalculatorFrame(new Calculator());
+public final class Main {
+	private Main() {};
+	
+	public static void main(final String args[]) {
+		final CalculatorFrame frame = new CalculatorFrame(new Calculator());
 		frame.setTitle("Java Swing Calculator");
 		frame.setSize(241, 217);
 		frame.pack();

@@ -11,7 +11,6 @@ import static org.integrallis.tdd.logic.CalculatorCommand.INVERSE;
 import static org.integrallis.tdd.logic.CalculatorCommand.MINUS;
 import static org.integrallis.tdd.logic.CalculatorCommand.MULTIPLICATION;
 import static org.integrallis.tdd.logic.CalculatorCommand.NINE;
-import static org.integrallis.tdd.logic.CalculatorCommand.NOOP;
 import static org.integrallis.tdd.logic.CalculatorCommand.ONE;
 import static org.integrallis.tdd.logic.CalculatorCommand.PERCENT;
 import static org.integrallis.tdd.logic.CalculatorCommand.PLUS;
@@ -31,7 +30,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-//import java.util.EnumSet;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,19 +55,20 @@ import org.integrallis.tdd.logic.CalculatorCommand;
  * @author bsbodden
  *
  */
-public class CalculatorFrame extends JFrame implements ActionListener {
-
-	private Calculator calculator;
+public class CalculatorFrame extends JFrame implements ActionListener, PropertyChangeListener {
+	private final Calculator calculator;
 
 	// Constructor
-	public CalculatorFrame(Calculator calculator) {
+	public CalculatorFrame(final Calculator calculator) {
+		super();
 		this.calculator = calculator;
+		calculator.addPropertyChangeListener(this);
 		initComponents();
 		calculator.clearAll();
 
 		// add WindowListener for closing frame and ending program
 		addWindowListener(new WindowAdapter() {
-			public void windowClosed(WindowEvent e) {
+			public void windowClosed(WindowEvent event) {
 				System.exit(0);
 			}
 		});
@@ -77,25 +78,11 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 	// Perform action
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == jmenuitemAbout) {
-			JDialog dlgAbout = new AboutDialog(this,
-					"About Java Swing Calculator", true);
+			JDialog dlgAbout = new AboutDialog(this, "About Java Swing Calculator", true);
 			dlgAbout.setVisible(true);
 		} else if (e.getSource() == jmenuitemExit) {
 			System.exit(0);
 		}
-
-		CalculatorCommand command = NOOP;
-		if (e.getSource() instanceof JButton) {
-			for (Map.Entry<CalculatorCommand,JButton> commandAndButton : commandsAndbuttons.entrySet()) {
-				if (commandAndButton.getValue() == e.getSource()) {
-					command = commandAndButton.getKey();
-				}
-			}
-		}
-		
-		calculator.processCommand(command);
-		
-		setDisplayString(calculator.getDisplayString());
 	}
 
 	void setDisplayString(String s) {
@@ -137,8 +124,7 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 
 		jmenuitemExit = new JMenuItem("Exit");
 		jmenuitemExit.setFont(f12);
-		jmenuitemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				ActionEvent.CTRL_MASK));
+		jmenuitemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
 		jmenuFile.add(jmenuitemExit);
 
 		jmenuHelp = new JMenu("Help");
@@ -174,7 +160,7 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 		
 		// create all buttons based on available commands
 		for (CalculatorCommand command : CalculatorCommand.asList()) {
-			JButton button = new JButton(new CalculatorAction(command));
+			JButton button = new JButton(new CalculatorAction(command, calculator));
 			commandsAndbuttons.put(command, button);
 		}
 
@@ -250,11 +236,6 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 		getContentPane().add(jplMaster, BorderLayout.SOUTH);
 		requestFocus();
 
-		// activate ActionListener
-		for (JButton button : commandsAndbuttons.values()) {
-			button.addActionListener(this);
-		}
-
 		jmenuitemAbout.addActionListener(this);
 		jmenuitemExit.addActionListener(this);
 	}
@@ -263,6 +244,13 @@ public class CalculatorFrame extends JFrame implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	public void propertyChange(PropertyChangeEvent e) {
+		Object source = e.getSource();
+        if (source == calculator) {
+		    setDisplayString(calculator.getDisplay());
+        }
+	}
 
 } // End of Swing Calculator Class.
 
